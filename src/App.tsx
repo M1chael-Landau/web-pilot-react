@@ -12,6 +12,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { track } from '@/lib/analytics'
 
 const THEME_KEY = 'web-pilot-react-theme'
 
@@ -59,7 +60,10 @@ function App() {
           </div>
           <Switch
             checked={dark}
-            onCheckedChange={setDark}
+            onCheckedChange={(checked) => {
+              setDark(checked)
+              track('theme-toggle', { theme: checked ? 'dark' : 'light' })
+            }}
             aria-label="Переключить тёмную тему"
           />
         </div>
@@ -76,10 +80,21 @@ function App() {
               {count}
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button onClick={() => setCount((value) => value + 1)}>
+              <Button
+                onClick={() => {
+                  setCount((value) => value + 1)
+                  track('counter-click')
+                }}
+              >
                 Увеличить
               </Button>
-              <Button variant="outline" onClick={() => setCount(0)}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setCount(0)
+                  track('counter-reset')
+                }}
+              >
                 Сбросить
               </Button>
             </div>
@@ -94,7 +109,10 @@ function App() {
             <CardTitle>Вкладки</CardTitle>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="info">
+            <Tabs
+              defaultValue="info"
+              onValueChange={(value) => track('tab-change', { tab: String(value) })}
+            >
               <TabsList className="mb-3">
                 <TabsTrigger value="info">Инфо</TabsTrigger>
                 <TabsTrigger value="more">Ещё</TabsTrigger>
@@ -127,7 +145,10 @@ function App() {
                 aria-label="Текст для эха"
               />
               <Button
-                onClick={() => setEcho(draft.trim())}
+                onClick={() => {
+                  setEcho(draft.trim())
+                  track('echo-show')
+                }}
                 disabled={draft.trim().length === 0}
               >
                 Показать
